@@ -1,11 +1,11 @@
 import { fetchJobsForCandidateAction, fetchProfileAction } from "@/actions";
 import Companies from "@/components/companies";
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 async function CompaniesPage() {
-  const user = await currentUser();
-  const profileInfo = await fetchProfileAction(user?.id);
+  const { userId } = await auth();
+  const profileInfo = await fetchProfileAction(userId);
 
   if (!profileInfo) redirect("/onboard");
   const jobsList = await fetchJobsForCandidateAction({});

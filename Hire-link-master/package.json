@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.31.8",
+    "@clerk/nextjs": "^6.37.3",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-menubar": "^1.0.4",
@@ -23,8 +23,8 @@
     "clsx": "^2.1.0",
     "lucide-react": "^0.368.0",
     "mongodb": "^6.8.0",
-    "mongoose": "^8.22.1",
-    "next": "^14.2.34",
+    "mongoose": "^9.1.6",
+    "next": "^16.1.6",
     "next-themes": "^0.3.0",
     "query-string": "^9.0.0",
     "react": "^18",

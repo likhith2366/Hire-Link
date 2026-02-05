@@ -7,28 +7,28 @@ import {
   fetchProfileAction,
 } from "@/actions";
 import JobListing from "@/components/job-listing";
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 async function JobsPage({ searchParams }) {
   console.log(searchParams, "searchParams");
-  const user = await currentUser();
-  const profileInfo = await fetchProfileAction(user?.id);
+  const { userId } = await auth();
+  const profileInfo = await fetchProfileAction(userId);
 
   const jobList =
     profileInfo?.role === "candidate"
       ? await fetchJobsForCandidateAction(searchParams)
-      : await fetchJobsForRecruiterAction(user?.id);
+      : await fetchJobsForRecruiterAction(userId);
 
   const getJobApplicationList =
     profileInfo?.role === "candidate"
-      ? await fetchJobApplicationsForCandidate(user?.id)
-      : await fetchJobApplicationsForRecruiter(user?.id);
+      ? await fetchJobApplicationsForCandidate(userId)
+      : await fetchJobApplicationsForRecruiter(userId);
 
   const fetchFilterCategories = await createFilterCategoryAction();
 
   return (
     <JobListing
-      user={JSON.parse(JSON.stringify(user))}
+      user={{ id: userId }}
       profileInfo={profileInfo}
       jobList={jobList}
       jobApplications={getJobApplicationList}

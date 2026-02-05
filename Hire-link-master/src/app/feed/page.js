@@ -1,11 +1,11 @@
 import { fetchAllFeedPostsAction, fetchProfileAction } from "@/actions";
 import Feed from "@/components/feed";
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 async function FeedPage() {
-  const user = await currentUser();
-  const profileInfo = await fetchProfileAction(user?.id);
+  const { userId } = await auth();
+  const profileInfo = await fetchProfileAction(userId);
   if (!profileInfo) redirect("/onboard");
 
   const allFeedPosts = await fetchAllFeedPostsAction();
@@ -13,7 +13,7 @@ async function FeedPage() {
   return (
     <Feed
       allFeedPosts={allFeedPosts}
-      user={JSON.parse(JSON.stringify(user))}
+      user={{ id: userId }}
       profileInfo={profileInfo}
     />
   );

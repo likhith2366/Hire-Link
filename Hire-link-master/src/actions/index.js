@@ -6,7 +6,7 @@ import Feed from "@/models/feed";
 import Job from "@/models/job";
 import Profile from "@/models/profile";
 import { revalidatePath } from "next/cache";
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -85,8 +85,8 @@ export async function updateJobApplicationAction(data, pathToRevalidate) {
   await connectToDB();
 
   // Get authenticated user
-  const user = await currentUser();
-  if (!user) {
+  const { userId: authUserId } = await auth();
+  if (!authUserId) {
     throw new Error("Unauthorized: User not authenticated");
   }
 
@@ -108,7 +108,7 @@ export async function updateJobApplicationAction(data, pathToRevalidate) {
   }
 
   // Authorization check: Only the recruiter who posted the job can update the application
-  if (existingApplication.recruiterUserID !== user.id) {
+  if (existingApplication.recruiterUserID !== authUserId) {
     throw new Error("Unauthorized: You can only update applications for your own job posts");
   }
 
@@ -151,8 +151,8 @@ export async function updateProfileAction(data, pathToRevalidate) {
   await connectToDB();
 
   // Get authenticated user
-  const user = await currentUser();
-  if (!user) {
+  const { userId: authUserId } = await auth();
+  if (!authUserId) {
     throw new Error("Unauthorized: User not authenticated");
   }
 
@@ -176,14 +176,14 @@ export async function updateProfileAction(data, pathToRevalidate) {
   }
 
   // Authorization check: Users can only update their own profile
-  if (existingProfile.userId !== user.id) {
+  if (existingProfile.userId !== authUserId) {
     throw new Error("Unauthorized: You can only update your own profile");
   }
 
   await Profile.findOneAndUpdate(
     {
       _id: _id,
-      userId: user.id, // Double-check userId in the query
+      userId: userId, // Double-check userId in the query
     },
     {
       userId,
@@ -257,8 +257,8 @@ export async function updateFeedPostAction(data, pathToRevalidate) {
   await connectToDB();
 
   // Get authenticated user
-  const user = await currentUser();
-  if (!user) {
+  const { userId: authUserId } = await auth();
+  if (!authUserId) {
     throw new Error("Unauthorized: User not authenticated");
   }
 
@@ -273,7 +273,7 @@ export async function updateFeedPostAction(data, pathToRevalidate) {
   // Authorization check: Users can only edit their own posts OR update likes
   // If the post owner is updating: allow all changes
   // If someone else is updating: only allow likes array changes
-  if (existingPost.userId !== user.id) {
+  if (existingPost.userId !== authUserId) {
     // Non-owner can only update likes, not the post content
     if (
       userId !== existingPost.userId ||

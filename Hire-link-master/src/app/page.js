@@ -1,15 +1,15 @@
 import { fetchProfileAction } from "@/actions";
 import HomepageButtonControls from "@/components/homepage-button-controls";
 import { Button } from "@/components/ui/button";
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Fragment } from "react";
 
 async function Home() {
-  const user = await currentUser();
-  const profileInfo = await fetchProfileAction(user?.id);
+  const { userId } = await auth();
+  const profileInfo = await fetchProfileAction(userId);
 
-  if (user && !profileInfo?._id) redirect("/onboard");
+  if (userId && !profileInfo?._id) redirect("/onboard");
 
   return (
     <Fragment>
@@ -29,7 +29,7 @@ async function Home() {
                 </h1>
                 <div className="w-full mt-6 flex items-center text-white justify-start gap-2">
                   <HomepageButtonControls
-                    user={JSON.parse(JSON.stringify(user))}
+                    user={{ id: userId }}
                     profileInfo={profileInfo}
                   />
                 </div>

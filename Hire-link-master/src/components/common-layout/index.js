@@ -1,12 +1,12 @@
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Header from "../header";
 import { fetchProfileAction } from "@/actions";
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 async function CommonLayout({ children, ...props }) {
-  const user = await currentUser();
-  const profileInfo = await fetchProfileAction(user?.id);
+  const { userId } = await auth();
+  const profileInfo = await fetchProfileAction(userId);
 
   return (
     <NextThemesProvider {...props}>
@@ -14,7 +14,7 @@ async function CommonLayout({ children, ...props }) {
         {/* Header Component */}
         <Header
           profileInfo={profileInfo}
-          user={JSON.parse(JSON.stringify(user))}
+          user={{ id: userId }}
         />
         {/* Header Component */}
 
